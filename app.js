@@ -1,15 +1,18 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import path from 'path'; // Add this line for path module
-import { fileURLToPath } from 'url'; // Add this line for fileURLToPath
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { submitForm } from './controllers/formController.js';
+import dotenv from 'dotenv'; // Import dotenv to load environment variables
+
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Connect to MongoDB Atlas
-mongoose.connect('mongodb+srv://root1:1234@simpleapp.u9lwvxg.mongodb.net/your-database-name', {
+// Connect to MongoDB Atlas using the environment variable
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -24,19 +27,15 @@ mongoose.connect('mongodb+srv://root1:1234@simpleapp.u9lwvxg.mongodb.net/your-da
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Serve the HTML form
-const __filename = fileURLToPath(import.meta.url); // Add this line for __filename
-const __dirname = path.dirname(__filename); // Add this line for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Handle form submissions
 app.post('/submit-form', submitForm);
 
-// Start the server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 });
-
