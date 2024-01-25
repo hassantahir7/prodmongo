@@ -3,15 +3,14 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { submitForm } from './controllers/formController.js';
-import dotenv from 'dotenv'; // Import dotenv to load environment variables
+import dotenv from 'dotenv';
+import mainRoutes from './routes/index.js';
 
-dotenv.config(); // Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Connect to MongoDB Atlas using the environment variable
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -23,18 +22,14 @@ mongoose.connect(process.env.MONGO_URI, {
         console.error('Error connecting to MongoDB Atlas:', err);
     });
 
-// Middleware to parse incoming request data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.post('/submit-form', submitForm);
+// Use main routes
+app.use('/', mainRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
